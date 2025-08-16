@@ -13,7 +13,6 @@ export const AuthProvider = ({ children }) => {
       try {
         const token = localStorage.getItem('token');
         if (token) {
-          // Verify token with backend
           const res = await axios.get('/api/users/me', {
             headers: { Authorization: `Bearer ${token}` }
           });
@@ -38,9 +37,10 @@ export const AuthProvider = ({ children }) => {
     setError(null);
   };
 
+  // This function handles the logout logic
   const logout = () => {
-    localStorage.removeItem('token');
-    setUser(null);
+    localStorage.removeItem('token'); // Clears the token from storage
+    setUser(null); // Clears the user from the application state
     setError(null);
   };
 

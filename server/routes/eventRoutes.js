@@ -1,13 +1,12 @@
+
 const express = require('express');
 const router = express.Router();
 const Event = require('../models/Event');
 const auth = require('../middleware/auth');
 
 // Create event
-// server/routes/eventRoutes.js
 router.post('/', auth, async (req, res) => {
   try {
-    // Convert date string to Date object
     const eventData = {
       ...req.body,
       date: new Date(req.body.date),
@@ -21,7 +20,8 @@ router.post('/', auth, async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 });
-// server/routes/eventRoutes.js
+
+// Get a single event by ID
 router.get('/:id', async (req, res) => {
   try {
     const event = await Event.findById(req.params.id)
@@ -35,17 +35,43 @@ router.get('/:id', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-// Get all events
+
+// Get all events with filtering
+// UPDATED: This route now correctly processes query parameters for filtering.
 router.get('/', async (req, res) => {
   try {
-    const events = await Event.find().populate('organizer', 'username');
+    const { category, date, search } = req.query;
+    const query = {};
+
+    if (category) {
+      query.category = category;
+    }
+
+    if (date) {
+      // Set up date range for the entire day
+      const startDate = new Date(date);
+      startDate.setHours(0, 0, 0, 0);
+      const endDate = new Date(date);
+      endDate.setHours(23, 59, 59, 999);
+      query.date = { $gte: startDate, $lte: endDate };
+    }
+
+    if (search) {
+      // Use regex for case-insensitive search on title and description
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    const events = await Event.find(query).populate('organizer', 'username');
     res.json(events);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// Register for event
+// Register for an event
 router.post('/:id/register', auth, async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);

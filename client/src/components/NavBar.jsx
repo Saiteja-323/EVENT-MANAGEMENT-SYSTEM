@@ -8,7 +8,7 @@ const Navbar = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate('/'); // Redirect to home after logout
   };
 
   return (
@@ -42,6 +42,7 @@ const Navbar = () => {
                   <span className="me-1">{user.username}</span>
                 </a>
                 <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                  {/* The onClick handler calls the handleLogout function */}
                   <li><button className="dropdown-item" onClick={handleLogout}>Logout</button></li>
                 </ul>
               </li>
