@@ -27,7 +27,8 @@ const Home = () => {
         setEvents(res.data);
         setLoading(false);
       } catch (err)
- {
+      {
+        console.error('Error fetching events:', err);
         setError('Failed to fetch events. Please try again later.');
         setLoading(false);
       }

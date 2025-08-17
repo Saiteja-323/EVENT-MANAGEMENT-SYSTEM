@@ -23,7 +23,7 @@ const EventDetails = () => {
         if (user && res.data.attendees.includes(user.id)) {
           setIsRegistered(true);
         }
-      } catch (err) {
+      } catch {
         setError('Event not found. It may have been removed or the URL is incorrect.');
         setLoading(false);
       }

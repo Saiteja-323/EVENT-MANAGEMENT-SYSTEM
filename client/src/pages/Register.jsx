@@ -48,7 +48,7 @@ const Register = () => {
     
     if (!email.trim()) {
       errors.email = 'Email is required';
-    } else if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
+    } else if (!/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
       errors.email = 'Please enter a valid email';
     }
     
@@ -79,7 +79,8 @@ const Register = () => {
     setError('');
     
     try {
-      const { confirmPassword, ...userData } = formData;
+      const userData = { ...formData };
+      delete userData.confirmPassword;
       await axios.post('/api/users', userData);
       
       setSuccess(true);
