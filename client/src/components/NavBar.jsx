@@ -6,9 +6,10 @@ const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
+  // This function is called when the logout button is clicked
   const handleLogout = () => {
-    logout();
-    navigate('/'); // Redirect to home after logout
+    logout(); // This clears the user's session
+    navigate('/'); // This redirects the user to the homepage
   };
 
   return (
@@ -33,6 +34,7 @@ const Navbar = () => {
             )}
           </ul>
           <ul className="navbar-nav">
+            {/* This is the logic for the dropdown */}
             {user ? (
               <li className="nav-item dropdown">
                 <a className="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -41,12 +43,13 @@ const Navbar = () => {
                   </div>
                   <span className="me-1">{user.username}</span>
                 </a>
+                {/* The dropdown menu with the logout button */}
                 <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                  {/* The onClick handler calls the handleLogout function */}
                   <li><button className="dropdown-item" onClick={handleLogout}>Logout</button></li>
                 </ul>
               </li>
             ) : (
+              // If no user is logged in, show Login and Register buttons
               <>
                 <li className="nav-item">
                   <Link className="nav-link" to="/login">Login</Link>
