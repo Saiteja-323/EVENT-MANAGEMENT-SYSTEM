@@ -6,10 +6,13 @@ const auth = require('../middleware/auth');
 // Create event
 router.post('/', auth, async (req, res) => {
   try {
-    const event = new Event({
+    const eventData = {
       ...req.body,
+      date: new Date(req.body.date),
       organizer: req.user.id
-    });
+    };
+    
+    const event = new Event(eventData);
     await event.save();
     res.status(201).json(event);
   } catch (error) {
@@ -23,7 +26,9 @@ router.get('/:id', async (req, res) => {
     const event = await Event.findById(req.params.id)
       .populate('organizer', 'username')
       .populate('attendees', 'username');
+    
     if (!event) return res.status(404).json({ msg: 'Event not found' });
+    
     res.json(event);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -65,18 +70,22 @@ router.get('/', async (req, res) => {
 // Register for an event
 router.post('/:id/register', auth, async (req, res) => {
   try {
-    const event = await Event.findById(req.params.id);
-    if (!event) return res.status(404).json({ msg: 'Event not found' });
+    const event = await Event.findByIdAndUpdate(
+      req.params.id,
+      { $addToSet: { attendees: req.user.id } },
+      { new: true }
+    )
+    .populate('organizer', 'username')
+    .populate('attendees', 'username');
 
-    if (event.attendees.includes(req.user.id)) {
-      return res.status(400).json({ msg: 'Already registered' });
+    if (!event) {
+      return res.status(404).json({ msg: 'Event not found' });
     }
-    
-    event.attendees.push(req.user.id);
-    await event.save();
+
     res.json(event);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Registration Error:", error);
+    res.status(500).json({ error: "Server error during registration." });
   }
 });
 
