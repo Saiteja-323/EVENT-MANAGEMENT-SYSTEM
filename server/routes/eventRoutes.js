@@ -1,4 +1,3 @@
-
 const express = require('express');
 const router = express.Router();
 const Event = require('../models/Event');
@@ -7,13 +6,10 @@ const auth = require('../middleware/auth');
 // Create event
 router.post('/', auth, async (req, res) => {
   try {
-    const eventData = {
+    const event = new Event({
       ...req.body,
-      date: new Date(req.body.date),
       organizer: req.user.id
-    };
-    
-    const event = new Event(eventData);
+    });
     await event.save();
     res.status(201).json(event);
   } catch (error) {
@@ -27,9 +23,7 @@ router.get('/:id', async (req, res) => {
     const event = await Event.findById(req.params.id)
       .populate('organizer', 'username')
       .populate('attendees', 'username');
-    
     if (!event) return res.status(404).json({ msg: 'Event not found' });
-    
     res.json(event);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -37,7 +31,6 @@ router.get('/:id', async (req, res) => {
 });
 
 // Get all events with filtering
-// UPDATED: This route now correctly processes query parameters for filtering.
 router.get('/', async (req, res) => {
   try {
     const { category, date, search } = req.query;
@@ -48,7 +41,6 @@ router.get('/', async (req, res) => {
     }
 
     if (date) {
-      // Set up date range for the entire day
       const startDate = new Date(date);
       startDate.setHours(0, 0, 0, 0);
       const endDate = new Date(date);
@@ -57,7 +49,6 @@ router.get('/', async (req, res) => {
     }
 
     if (search) {
-      // Use regex for case-insensitive search on title and description
       query.$or = [
         { title: { $regex: search, $options: 'i' } },
         { description: { $regex: search, $options: 'i' } }
@@ -76,7 +67,7 @@ router.post('/:id/register', auth, async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
     if (!event) return res.status(404).json({ msg: 'Event not found' });
-    
+
     if (event.attendees.includes(req.user.id)) {
       return res.status(400).json({ msg: 'Already registered' });
     }

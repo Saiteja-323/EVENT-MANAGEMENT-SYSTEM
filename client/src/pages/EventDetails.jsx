@@ -18,13 +18,14 @@ const EventDetails = () => {
       try {
         const res = await axios.get(`/api/events/${id}`);
         setEvent(res.data);
-        setLoading(false);
         
-        if (user && res.data.attendees.includes(user.id)) {
+        // Corrected logic: Check if an attendee object has the user's ID
+        if (user && res.data.attendees.some(attendee => attendee._id === user.id)) {
           setIsRegistered(true);
         }
       } catch {
         setError('Event not found. It may have been removed or the URL is incorrect.');
+      } finally {
         setLoading(false);
       }
     };

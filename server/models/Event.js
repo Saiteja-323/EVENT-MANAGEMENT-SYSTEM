@@ -8,7 +8,7 @@ const eventSchema = new mongoose.Schema({
     required: true,
     validate: {
       validator: function(v) {
-        return v > Date.now();
+        return v > new Date();
       },
       message: 'Event date must be in the future'
     }
@@ -16,7 +16,7 @@ const eventSchema = new mongoose.Schema({
   location: { type: String, required: true },
   organizer: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   attendees: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-  category: { type: String, enum: ['Conference', 'Workshop', 'Social', 'Other'] },
+  category: { type: String, enum: ['Conference', 'Workshop', 'Social', 'Other'], default: 'Other' },
   createdAt: { type: Date, default: Date.now }
 });
 
