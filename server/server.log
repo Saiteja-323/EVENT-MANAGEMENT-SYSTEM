@@ -1068,3 +1068,9 @@
 {"level":"info","message":"POST /api/events/68a27b647a53eb38a1bcd230/register","timestamp":"2025-09-14T18:35:07.777Z"}
 {"level":"info","message":"GET /api/events?category=&search=","timestamp":"2025-09-14T18:35:11.094Z"}
 {"level":"info","message":"GET /api/events?category=&search=","timestamp":"2025-09-14T18:35:11.117Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2025-12-23T11:29:40.203Z"}
+{"level":"info","message":"MongoDB connected","timestamp":"2025-12-23T11:29:40.249Z"}
+{"level":"info","message":"GET /api/events?category=&search=","timestamp":"2025-12-23T11:35:12.269Z"}
+{"level":"info","message":"GET /api/events?category=&search=","timestamp":"2025-12-23T11:35:12.443Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2025-12-23T12:22:13.838Z"}
+{"level":"info","message":"MongoDB connected","timestamp":"2025-12-23T12:22:13.869Z"}

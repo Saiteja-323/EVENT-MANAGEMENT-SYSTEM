@@ -21,9 +21,14 @@ const EventDetails = () => {
         setLoading(false);
         
         // Check registration status
-        if (user && res.data.attendees.some(a => a && a._id === user.id)) {
-          setIsRegistered(true);
-        }
+        if (
+  user &&
+  Array.isArray(res.data.attendees) &&
+  res.data.attendees.some(a => a && a._id === user.id)
+) {
+  setIsRegistered(true);
+}
+
       } catch {
         setError('Event not found. It may have been removed or the URL is incorrect.');
         setLoading(false);
@@ -169,7 +174,7 @@ const EventDetails = () => {
                     </ListGroup.Item>
                     
                     {event.attendees.length > 0 ? (
-                      event.attendees.map(attendee => (
+                      Array.isArray(event.attendees) && event.attendees.map(attendee =>(
                         <ListGroup.Item key={attendee._id} className="d-flex align-items-center py-2">
                           <div className="bg-light text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style={{width: '36px', height: '36px'}}>
                             {attendee.username.charAt(0).toUpperCase()}

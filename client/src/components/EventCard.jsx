@@ -47,7 +47,7 @@ const EventCard = ({ event }) => {
         <div className="d-flex justify-content-between align-items-center mt-3">
           <div className="d-flex align-items-center">
             <i className="bi bi-people me-1"></i>
-            <span>{event.attendees.length} attending</span>
+              <span>{Array.isArray(event.attendees) ? event.attendees.length : 0} attending</span>
           </div>
           <Link to={`/events/${event._id}`} className="btn btn-sm btn-primary">
             View Details

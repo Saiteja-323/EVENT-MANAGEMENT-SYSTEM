@@ -26,7 +26,12 @@ const Home = () => {
         }
         
         const res = await axios.get('/api/events', { params });
-        setEvents(res.data);
+        if (Array.isArray(res.data)) {
+  setEvents(res.data);
+} else {
+  setEvents([]);
+}
+
         setLoading(false);
       } catch {
         setError('Failed to fetch events. Please try again later.');
@@ -139,7 +144,7 @@ const Home = () => {
           </div>
           
           <Row xs={1} md={2} lg={3} className="g-4">
-            {events.map(event => (
+            {Array.isArray(events) && events.map(event =>  (
               <Col key={event._id}>
                 <EventCard event={event} />
               </Col>
