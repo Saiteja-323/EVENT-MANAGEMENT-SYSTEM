@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
 import { Container, Form, Button, Alert, Card, Spinner } from 'react-bootstrap';
+import api from '../api/axios';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -11,6 +11,7 @@ const Login = () => {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -20,47 +21,36 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Client-side validation
+
     if (!formData.email || !formData.password) {
       setError('Email and password are required');
       return;
     }
-    
+
     setLoading(true);
     setError('');
-    
+
     try {
-      const response = await axios.post('/api/users/login', formData, {
-        headers: { 'Content-Type': 'application/json' }
-      });
-      
-      // Save token to localStorage
-      localStorage.setItem('token', response.data.token);
-      
-      // Update auth context
-      login(response.data.token, response.data.user);
-      
-      // Redirect to home page
+      const res = await api.post('/api/users/login', formData);
+      login(res.data.token, res.data.user);
       navigate('/');
     } catch (err) {
       let errorMessage = 'Login failed. Please try again.';
-      
+
       if (err.response) {
-        // Server responded with error status code
         if (err.response.status === 401) {
           errorMessage = 'Invalid email or password';
         } else if (err.response.status === 400) {
           errorMessage = 'Missing required fields';
-        } else if (err.response.data && err.response.data.error) {
+        } else if (err.response.data?.error) {
           errorMessage = err.response.data.error;
         }
-      } else if (err.request) {
-        // Request was made but no response received
+      } else {
         errorMessage = 'No response from server. Please check your connection.';
       }
-      
+
       setError(errorMessage);
+    } finally {
       setLoading(false);
     }
   };
@@ -71,7 +61,7 @@ const Login = () => {
         <h1 className="display-5 fw-bold">Welcome Back</h1>
         <p className="lead text-muted">Sign in to manage your events</p>
       </div>
-      
+
       <div className="d-flex justify-content-center">
         <Card className="glass-container border-0 shadow-sm" style={{ width: '100%', maxWidth: '450px' }}>
           <Card.Body className="p-4">
@@ -81,7 +71,7 @@ const Login = () => {
                 {error}
               </Alert>
             )}
-            
+
             <Form onSubmit={handleSubmit}>
               <Form.Group className="mb-3">
                 <Form.Label>Email address</Form.Label>
@@ -95,7 +85,7 @@ const Login = () => {
                   className="py-2"
                 />
               </Form.Group>
-              
+
               <Form.Group className="mb-4">
                 <Form.Label>Password</Form.Label>
                 <Form.Control
@@ -113,21 +103,21 @@ const Login = () => {
                   </Link>
                 </div>
               </Form.Group>
-              
+
               <div className="d-grid mb-4">
-                <Button 
-                  variant="primary" 
-                  size="lg" 
-                  type="submit" 
+                <Button
+                  variant="primary"
+                  size="lg"
+                  type="submit"
                   disabled={loading}
                   className="py-3"
                 >
                   {loading ? (
                     <>
-                      <Spinner 
-                        as="span" 
-                        animation="border" 
-                        size="sm" 
+                      <Spinner
+                        as="span"
+                        animation="border"
+                        size="sm"
                         role="status"
                         aria-hidden="true"
                         className="me-2"
@@ -139,7 +129,7 @@ const Login = () => {
                   )}
                 </Button>
               </div>
-              
+
               <div className="text-center mt-4 pt-3 border-top">
                 <p className="text-muted mb-0">Don't have an account?</p>
                 <Link to="/register" className="btn btn-outline-primary mt-2">

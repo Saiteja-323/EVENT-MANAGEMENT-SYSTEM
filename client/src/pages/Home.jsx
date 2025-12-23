@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import EventCard from '../components/EventCard';
 import { Container, Row, Col, Spinner, Form, Button, Alert } from 'react-bootstrap';
+import api from '../api/axios';
 
 const Home = () => {
   const [events, setEvents] = useState([]);
@@ -16,44 +16,41 @@ const Home = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
+        setLoading(true);
+        setError('');
+
         const params = {
           category: filters.category,
           search: filters.search
         };
-        
+
         if (filters.date) {
           params.date = new Date(filters.date).toISOString();
         }
-        
-        const res = await axios.get('/api/events', { params });
-        if (Array.isArray(res.data)) {
-  setEvents(res.data);
-} else {
-  setEvents([]);
-}
 
-        setLoading(false);
+        const res = await api.get('/api/events', { params });
+
+        if (Array.isArray(res.data)) {
+          setEvents(res.data);
+        } else {
+          setEvents([]);
+        }
       } catch {
         setError('Failed to fetch events. Please try again later.');
+        setEvents([]);
+      } finally {
         setLoading(false);
       }
     };
+
     fetchEvents();
   }, [filters]);
 
-   const handleFilterChange = (e) => {
-    // Only update search filter when typing in search field
-    if (e.target.name === 'search') {
-      setFilters({
-        ...filters,
-        search: e.target.value
-      });
-    } else {
-      setFilters({
-        ...filters,
-        [e.target.name]: e.target.value
-      });
-    }
+  const handleFilterChange = (e) => {
+    setFilters({
+      ...filters,
+      [e.target.name]: e.target.value
+    });
   };
 
   const clearFilters = () => {
@@ -81,7 +78,7 @@ const Home = () => {
         <h1 className="display-5 fw-bold mb-3">Discover Amazing Events</h1>
         <p className="lead text-muted">Find and join events that match your interests</p>
       </div>
-      
+
       <div className="bg-white p-4 rounded-3 shadow-sm mb-5 glass-container">
         <h2 className="h5 mb-4">Find Your Perfect Event</h2>
         <Row className="g-3">
@@ -142,9 +139,9 @@ const Home = () => {
             <h2 className="h4 mb-0">Upcoming Events</h2>
             <small className="text-muted">{events.length} events found</small>
           </div>
-          
+
           <Row xs={1} md={2} lg={3} className="g-4">
-            {Array.isArray(events) && events.map(event =>  (
+            {Array.isArray(events) && events.map(event => (
               <Col key={event._id}>
                 <EventCard event={event} />
               </Col>
