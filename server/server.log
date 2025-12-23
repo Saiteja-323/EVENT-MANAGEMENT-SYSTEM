@@ -1117,3 +1117,14 @@
 {"level":"info","message":"POST /api/users/login","timestamp":"2025-12-23T14:51:55.539Z"}
 {"level":"info","message":"GET /api/events?category=&search=","timestamp":"2025-12-23T14:51:55.956Z"}
 {"level":"info","message":"GET /api/events?category=&search=","timestamp":"2025-12-23T14:51:56.162Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2025-12-23T15:24:29.896Z"}
+{"level":"info","message":"MongoDB connected","timestamp":"2025-12-23T15:24:37.503Z"}
+{"level":"info","message":"GET /api/events?category=&search=","timestamp":"2025-12-23T15:24:51.274Z"}
+{"level":"info","message":"GET /api/users/me","timestamp":"2025-12-23T15:24:51.300Z"}
+{"level":"info","message":"GET /api/users/me","timestamp":"2025-12-23T15:24:51.330Z"}
+{"level":"info","message":"GET /api/events?category=&search=","timestamp":"2025-12-23T15:24:51.998Z"}
+{"level":"info","message":"GET /api/events?category=&search=","timestamp":"2025-12-23T15:25:03.210Z"}
+{"level":"info","message":"GET /api/events?category=&search=","timestamp":"2025-12-23T15:25:03.309Z"}
+{"level":"info","message":"POST /api/users/login","timestamp":"2025-12-23T15:25:11.148Z"}
+{"level":"info","message":"GET /api/events?category=&search=","timestamp":"2025-12-23T15:25:11.597Z"}
+{"level":"info","message":"GET /api/events?category=&search=","timestamp":"2025-12-23T15:25:11.701Z"}

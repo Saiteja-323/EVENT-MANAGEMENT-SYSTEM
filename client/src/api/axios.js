@@ -1,10 +1,13 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: 'https://event-management-system-f1df.onrender.com',
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
-// Automatically attach token if present
+// Automatically attach token
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
