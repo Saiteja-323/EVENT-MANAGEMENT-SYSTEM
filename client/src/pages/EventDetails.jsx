@@ -85,7 +85,7 @@ const EventDetails = () => {
             <Badge bg="primary" className="me-2">{event.category}</Badge>
             <small className="text-muted">
               Organized by <span className="fw-semibold">
-                {event.organizer ? event.organizer.username : 'Deleted User'}
+                {event.organizer?.username || 'Deleted User'}
               </span>
             </small>
           </div>
@@ -104,6 +104,7 @@ const EventDetails = () => {
                 />
                 <Card.Body>
                   <h1 className="display-5 fw-bold mb-3">{event.title}</h1>
+
                   <div className="d-flex align-items-center text-muted mb-4">
                     <i className="bi bi-calendar-event me-2"></i>
                     <span>{formatDate(event.date)}</span>
@@ -155,6 +156,7 @@ const EventDetails = () => {
                 <Card.Header className="py-3 bg-primary text-white">
                   <h2 className="h5 mb-0">Attendees</h2>
                 </Card.Header>
+
                 <Card.Body className="p-0">
                   <ListGroup variant="flush">
                     <ListGroup.Item className="py-3">
@@ -168,14 +170,19 @@ const EventDetails = () => {
 
                     {Array.isArray(event.attendees) && event.attendees.length > 0 ? (
                       event.attendees.map(attendee => (
-                        <ListGroup.Item key={attendee._id} className="d-flex align-items-center py-2">
+                        <ListGroup.Item
+                          key={attendee?._id || Math.random()}
+                          className="d-flex align-items-center py-2"
+                        >
                           <div
                             className="bg-light text-primary rounded-circle d-flex align-items-center justify-content-center me-3"
                             style={{ width: '36px', height: '36px' }}
                           >
-                            {attendee.username.charAt(0).toUpperCase()}
+                            {attendee?.username
+                              ? attendee.username.charAt(0).toUpperCase()
+                              : '?'}
                           </div>
-                          <span>{attendee.username}</span>
+                          <span>{attendee?.username || 'Unknown User'}</span>
                         </ListGroup.Item>
                       ))
                     ) : (
