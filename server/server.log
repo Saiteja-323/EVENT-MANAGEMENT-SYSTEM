@@ -1074,3 +1074,37 @@
 {"level":"info","message":"GET /api/events?category=&search=","timestamp":"2025-12-23T11:35:12.443Z"}
 {"level":"info","message":"Server running on port 5000","timestamp":"2025-12-23T12:22:13.838Z"}
 {"level":"info","message":"MongoDB connected","timestamp":"2025-12-23T12:22:13.869Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2025-12-23T12:44:31.950Z"}
+{"level":"info","message":"MongoDB connected","timestamp":"2025-12-23T12:44:31.986Z"}
+{"level":"info","message":"GET /api/events?category=&search=","timestamp":"2025-12-23T12:44:54.615Z"}
+{"level":"info","message":"GET /api/events?category=&search=","timestamp":"2025-12-23T12:44:54.704Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2025-12-23T12:52:55.681Z"}
+{"level":"info","message":"MongoDB connected","timestamp":"2025-12-23T12:52:55.723Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2025-12-23T12:54:03.565Z"}
+{"level":"info","message":"MongoDB connected","timestamp":"2025-12-23T12:54:03.599Z"}
+{"level":"info","message":"GET /api/events?category=&search=","timestamp":"2025-12-23T13:18:04.845Z"}
+{"level":"info","message":"GET /api/events?category=&search=","timestamp":"2025-12-23T13:18:04.917Z"}
+{"level":"info","message":"POST /api/users","timestamp":"2025-12-23T13:18:51.915Z"}
+{"level":"info","message":"POST /api/users/login","timestamp":"2025-12-23T13:19:25.391Z"}
+{"level":"info","message":"GET /api/events?category=&search=","timestamp":"2025-12-23T13:19:25.729Z"}
+{"level":"info","message":"GET /api/events?category=&search=","timestamp":"2025-12-23T13:19:25.761Z"}
+{"level":"info","message":"GET /api/events?category=&search=","timestamp":"2025-12-23T13:23:36.446Z"}
+{"level":"info","message":"GET /api/events?category=&search=","timestamp":"2025-12-23T13:23:36.472Z"}
+{"level":"info","message":"POST /api/users/login","timestamp":"2025-12-23T13:23:48.830Z"}
+{"level":"info","message":"GET /api/events?category=&search=","timestamp":"2025-12-23T13:23:49.106Z"}
+{"level":"info","message":"GET /api/events?category=&search=","timestamp":"2025-12-23T13:23:49.125Z"}
+{"level":"info","message":"GET /api/events?category=&search=","timestamp":"2025-12-23T13:38:42.891Z"}
+{"level":"info","message":"GET /api/events?category=&search=","timestamp":"2025-12-23T13:38:42.915Z"}
+{"level":"info","message":"POST /api/users/login","timestamp":"2025-12-23T13:38:50.562Z"}
+{"level":"info","message":"GET /api/events?category=&search=","timestamp":"2025-12-23T13:38:50.830Z"}
+{"level":"info","message":"GET /api/events?category=&search=","timestamp":"2025-12-23T13:38:50.855Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2025-12-23T13:39:47.709Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2025-12-23T13:41:11.153Z"}
+{"level":"info","message":"MongoDB connected","timestamp":"2025-12-23T13:41:17.379Z"}
+{"level":"info","message":"GET /api/events?category=&search=","timestamp":"2025-12-23T13:41:24.800Z"}
+{"level":"info","message":"GET /api/events?category=&search=","timestamp":"2025-12-23T13:41:24.973Z"}
+{"level":"info","message":"POST /api/users/login","timestamp":"2025-12-23T13:41:35.962Z"}
+{"level":"info","message":"POST /api/users","timestamp":"2025-12-23T13:42:01.992Z"}
+{"level":"info","message":"POST /api/users/login","timestamp":"2025-12-23T13:42:08.526Z"}
+{"level":"info","message":"GET /api/events?category=&search=","timestamp":"2025-12-23T13:42:08.904Z"}
+{"level":"info","message":"GET /api/events?category=&search=","timestamp":"2025-12-23T13:42:08.995Z"}
