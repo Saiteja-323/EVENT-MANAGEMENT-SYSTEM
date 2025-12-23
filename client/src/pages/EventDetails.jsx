@@ -14,6 +14,11 @@ const EventDetails = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  const getInitial = (name) =>
+    typeof name === 'string' && name.length > 0
+      ? name.charAt(0).toUpperCase()
+      : '?';
+
   useEffect(() => {
     const fetchEvent = async () => {
       try {
@@ -171,16 +176,14 @@ const EventDetails = () => {
                     {Array.isArray(event.attendees) && event.attendees.length > 0 ? (
                       event.attendees.map(attendee => (
                         <ListGroup.Item
-                          key={attendee?._id || Math.random()}
+                          key={attendee?._id || crypto.randomUUID()}
                           className="d-flex align-items-center py-2"
                         >
                           <div
                             className="bg-light text-primary rounded-circle d-flex align-items-center justify-content-center me-3"
                             style={{ width: '36px', height: '36px' }}
                           >
-                            {attendee?.username
-                              ? attendee.username.charAt(0).toUpperCase()
-                              : '?'}
+                            {getInitial(attendee?.username)}
                           </div>
                           <span>{attendee?.username || 'Unknown User'}</span>
                         </ListGroup.Item>
