@@ -1,156 +1,379 @@
-import React, { useState, useEffect } from 'react';
-import EventCard from '../components/EventCard';
-import { Container, Row, Col, Spinner, Form, Button, Alert } from 'react-bootstrap';
+import React, {
+  useEffect,
+  useState
+} from 'react';
+
 import api from '../api/axios';
 
-const Home = () => {
+import EventCard from '../components/EventCard';
+
+function Home() {
+
   const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [filters, setFilters] = useState({
-    category: '',
-    date: '',
-    search: ''
-  });
+
+  const [filteredEvents, setFilteredEvents] =
+    useState([]);
+
+  const [loading, setLoading] =
+    useState(true);
+
+
+  const [filters, setFilters] =
+    useState({
+      search: '',
+      category: '',
+      date: ''
+    });
+
+
+
+  /* -----------------------
+     Load events once
+  ----------------------- */
 
   useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        setLoading(true);
-        setError('');
 
-        const params = {
-          category: filters.category,
-          search: filters.search
-        };
+    loadEvents();
 
-        if (filters.date) {
-          params.date = new Date(filters.date).toISOString();
-        }
+  }, []);
 
-        const res = await api.get('/api/events', { params });
 
-        if (Array.isArray(res.data)) {
-          setEvents(res.data);
-        } else {
-          setEvents([]);
-        }
-      } catch {
-        setError('Failed to fetch events. Please try again later.');
-        setEvents([]);
-      } finally {
-        setLoading(false);
-      }
-    };
 
-    fetchEvents();
-  }, [filters]);
+  const loadEvents = async () => {
 
-  const handleFilterChange = (e) => {
-    setFilters({
-      ...filters,
-      [e.target.name]: e.target.value
-    });
+    try {
+
+      const res =
+        await api.get(
+          '/api/events'
+        );
+
+      setEvents(res.data);
+
+      setFilteredEvents(
+        res.data
+      );
+
+    }
+    catch (err) {
+
+      console.error(err);
+
+    }
+    finally {
+
+      setLoading(false);
+
+    }
+
   };
+
+
+
+  /* -----------------------
+     Instant filter
+  ----------------------- */
+
+  useEffect(() => {
+
+    let data = [...events];
+
+
+    // search filter
+    if (filters.search.trim()) {
+
+      data = data.filter(
+        event =>
+          event.title
+            .toLowerCase()
+            .includes(
+              filters.search.toLowerCase()
+            )
+      );
+
+    }
+
+
+    // category filter
+    if (filters.category) {
+
+      data = data.filter(
+        event =>
+          event.category ===
+          filters.category
+      );
+
+    }
+
+
+    // date filter
+    if (filters.date) {
+
+      data = data.filter(
+        event => {
+
+          const eventDate =
+            new Date(event.date)
+              .toISOString()
+              .split('T')[0];
+
+          return (
+            eventDate ===
+            filters.date
+          );
+
+        }
+      );
+
+    }
+
+
+    setFilteredEvents(data);
+
+  }, [filters, events]);
+
+
+
+  /* -----------------------
+     Input changes
+  ----------------------- */
+
+  const handleChange = (e) => {
+
+    setFilters({
+
+      ...filters,
+
+      [e.target.name]:
+        e.target.value
+
+    });
+
+  };
+
+
 
   const clearFilters = () => {
+
     setFilters({
-      category: '',
-      date: '',
-      search: ''
+      search:'',
+      category:'',
+      date:''
     });
+
   };
 
+
+
   if (loading) {
+
     return (
-      <Container className="text-center mt-5 py-5">
-        <Spinner animation="border" variant="primary" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </Spinner>
-        <p className="mt-3">Loading events...</p>
-      </Container>
+      <div style={loadingStyle}>
+        Loading events...
+      </div>
     );
+
   }
 
+
+
   return (
-    <Container className="py-4">
-      <div className="text-center mb-5">
-        <h1 className="display-5 fw-bold mb-3">Discover Amazing Events</h1>
-        <p className="lead text-muted">Find and join events that match your interests</p>
-      </div>
 
-      <div className="bg-white p-4 rounded-3 shadow-sm mb-5 glass-container">
-        <h2 className="h5 mb-4">Find Your Perfect Event</h2>
-        <Row className="g-3">
-          <Col md={5}>
-            <Form.Control
-              type="text"
-              placeholder="Search events by title..."
-              name="search"
-              value={filters.search}
-              onChange={handleFilterChange}
-              className="border-primary"
-            />
-          </Col>
-          <Col md={3}>
-            <Form.Select
-              name="category"
-              value={filters.category}
-              onChange={handleFilterChange}
-              className="border-primary"
-            >
-              <option value="">All Categories</option>
-              <option value="Conference">Conference</option>
-              <option value="Workshop">Workshop</option>
-              <option value="Social">Social</option>
-              <option value="Other">Other</option>
-            </Form.Select>
-          </Col>
-          <Col md={3}>
-            <Form.Control
-              type="date"
-              name="date"
-              value={filters.date}
-              onChange={handleFilterChange}
-              className="border-primary"
-            />
-          </Col>
-          <Col md={1}>
-            <Button variant="outline-primary" onClick={clearFilters} className="w-100">
-              <i className="bi bi-arrow-repeat"></i>
-            </Button>
-          </Col>
-        </Row>
-      </div>
+    <div style={pageStyle}>
 
-      {error && <Alert variant="danger" className="mb-4">{error}</Alert>}
+      <div style={heroStyle}>
 
-      {events.length === 0 ? (
-        <div className="text-center py-5">
-          <div className="mb-3">
-            <i className="bi bi-calendar-x display-1 text-muted"></i>
-          </div>
-          <h3>No events found</h3>
-          <p className="text-muted">Try adjusting your search filters</p>
+        <h1 style={titleStyle}>
+          Discover Amazing Events
+        </h1>
+
+        <p style={subtitleStyle}>
+          Find and join events
+          that match your interests
+        </p>
+
+
+
+        {/* FILTERS */}
+        <div style={filterBoxStyle}>
+
+          <input
+            type="text"
+            name="search"
+            placeholder="Search events..."
+            value={filters.search}
+            onChange={handleChange}
+            style={inputStyle}
+          />
+
+
+          <select
+            name="category"
+            value={filters.category}
+            onChange={handleChange}
+            style={inputStyle}
+          >
+            <option value="">
+              All Categories
+            </option>
+
+            <option value="Conference">
+              Conference
+            </option>
+
+            <option value="Workshop">
+              Workshop
+            </option>
+
+            <option value="Social">
+              Social
+            </option>
+
+            <option value="Other">
+              Other
+            </option>
+
+          </select>
+
+
+          <input
+            type="date"
+            name="date"
+            value={filters.date}
+            onChange={handleChange}
+            style={inputStyle}
+          />
+
+
+          <button
+            onClick={clearFilters}
+            style={clearBtnStyle}
+          >
+            Clear
+          </button>
+
         </div>
-      ) : (
-        <>
-          <div className="d-flex justify-content-between align-items-center mb-4">
-            <h2 className="h4 mb-0">Upcoming Events</h2>
-            <small className="text-muted">{events.length} events found</small>
-          </div>
 
-          <Row xs={1} md={2} lg={3} className="g-4">
-            {Array.isArray(events) && events.map(event => (
-              <Col key={event._id}>
-                <EventCard event={event} />
-              </Col>
-            ))}
-          </Row>
-        </>
-      )}
-    </Container>
+
+        <div style={countStyle}>
+          {filteredEvents.length}
+          events found
+        </div>
+
+      </div>
+
+
+
+      {/* EVENTS */}
+      <div style={gridStyle}>
+
+        {
+          filteredEvents.length > 0 ? (
+
+            filteredEvents.map(
+              event => (
+
+                <EventCard
+                  key={event._id}
+                  event={event}
+                />
+
+              )
+            )
+
+          ) : (
+
+            <div style={emptyStyle}>
+              No events found
+            </div>
+
+          )
+        }
+
+      </div>
+
+    </div>
+
   );
-};
+
+}
 
 export default Home;
+
+
+
+/* -------------------
+   STYLES
+------------------- */
+
+const pageStyle = {
+  maxWidth:'1200px',
+  margin:'40px auto',
+  padding:'20px'
+};
+
+const heroStyle = {
+  background:
+   'linear-gradient(145deg,#111827,#1e3a8a)',
+  padding:'35px',
+  borderRadius:'22px',
+  color:'white',
+  marginBottom:'30px'
+};
+
+const titleStyle = {
+  fontSize:'48px',
+  marginBottom:'10px'
+};
+
+const subtitleStyle = {
+  color:'#d1d5db',
+  marginBottom:'30px'
+};
+
+const filterBoxStyle = {
+  display:'grid',
+  gridTemplateColumns:
+   '2fr 1fr 1fr auto',
+  gap:'14px'
+};
+
+const inputStyle = {
+  padding:'14px',
+  borderRadius:'10px',
+  border:'1px solid #334155',
+  background:'#0f172a',
+  color:'white'
+};
+
+const clearBtnStyle = {
+  background:'#2563eb',
+  color:'white',
+  border:'none',
+  borderRadius:'10px',
+  padding:'14px 20px',
+  cursor:'pointer'
+};
+
+const countStyle = {
+  marginTop:'18px',
+  color:'#cbd5e1'
+};
+
+const gridStyle = {
+  display:'grid',
+  gridTemplateColumns:
+   'repeat(auto-fit,minmax(280px,1fr))',
+  gap:'22px'
+};
+
+const emptyStyle = {
+  color:'white',
+  fontSize:'20px'
+};
+
+const loadingStyle = {
+  color:'white',
+  textAlign:'center',
+  marginTop:'100px'
+};
