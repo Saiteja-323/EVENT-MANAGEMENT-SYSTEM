@@ -1,160 +1,211 @@
-const express = require('express');
-const router = express.Router();
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const express=require('express');
+const router=express.Router();
 
-// @route    POST /api/users
-// @desc     Register a new user
-// @access   Public
-router.post('/', async (req, res) => {
-  const { username, email, password } = req.body;
+const bcrypt=require('bcryptjs');
+const jwt=require('jsonwebtoken');
 
-  try {
-    // Validate request
-    if (!username || !email || !password) {
-      return res.status(400).json({ 
-        error: 'All fields are required' 
-      });
-    }
+const User=require('../models/User');
 
-    // Check if user already exists by email
-    let existingEmail = await User.findOne({ email });
-    if (existingEmail) {
-      return res.status(409).json({ 
-        error: 'User with this email already exists' 
-      });
-    }
 
-    // Check if username is already taken
-    let existingUsername = await User.findOne({ username });
-    if (existingUsername) {
-      return res.status(409).json({ 
-        error: 'Username is already taken' 
-      });
-    }
+// REGISTER
+router.post('/',async(req,res)=>{
 
-    // Create new user
-    const user = new User({ username, email, password });
+try{
 
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(password, salt);
+const {username,email,password}=req.body;
 
-    // Save user to database
-    await user.save();
+if(!username || !email || !password){
 
-    // Create and return JWT
-    const payload = {
-      user: {
-        id: user.id
-      }
-    };
-
-    jwt.sign(
-      payload,
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' },
-      (err, token) => {
-        if (err) {
-          console.error('JWT generation error:', err);
-          return res.status(500).json({ error: 'Server error' });
-        }
-        res.status(201).json({ 
-          token, 
-          user: { 
-            id: user.id, 
-            username: user.username, 
-            email: user.email,
-            role: user.role
-          } 
-        });
-      }
-    );
-  } catch (err) {
-    console.error('Registration error:', err);
-    
-    // Handle specific Mongoose validation errors
-    if (err.name === 'ValidationError') {
-      const errors = Object.values(err.errors).map(val => val.message);
-      return res.status(400).json({ error: errors.join(', ') });
-    }
-    
-    res.status(500).json({ error: 'Server error during registration' });
-  }
-});
-// @route    POST /api/users/login
-// @desc     Authenticate user & get token
-// @access   Public
-router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    // Check if user exists
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
-
-    // Check password
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
-
-    // Create and return JWT
-    const payload = {
-      user: {
-        id: user.id
-      }
-    };
-
-    jwt.sign(
-      payload,
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' },
-      (err, token) => {
-        if (err) throw err;
-        res.json({ 
-          token, 
-          user: { 
-            id: user.id, 
-            username: user.username, 
-            email: user.email,
-            role: user.role
-          } 
-        });
-      }
-    );
-  } catch (err) {
-    console.error('Login error:', err);
-    res.status(500).json({ error: 'Server error' });
-  }
+return res.status(400).json({
+error:'All fields required'
 });
 
-// @route    GET /api/users/me
-// @desc     Get current user
-// @access   Private
-router.get('/me', async (req, res) => {
-  try {
-    // Get token from header
-    const token = req.header('x-auth-token');
-    if (!token) {
-      return res.status(401).json({ error: 'No token, authorization denied' });
-    }
+}
 
-    // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.user.id).select('-password');
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    res.json(user);
-  } catch (err) {
-    console.error('Get current user error:', err);
-    res.status(500).json({ error: 'Server error' });
-  }
+
+// check existing
+let existingUser=await User.findOne({
+$or:[
+{email},
+{username}
+]
+});
+
+if(existingUser){
+
+return res.status(409).json({
+error:'User already exists'
+});
+
+}
+
+
+// hash password
+const salt=await bcrypt.genSalt(10);
+
+const hashedPassword=
+await bcrypt.hash(
+password,
+salt
+);
+
+
+// create user
+const user=new User({
+username,
+email,
+password:hashedPassword
+});
+
+await user.save();
+
+
+// token
+const payload={
+user:{
+id:user.id
+}
+};
+
+const token=jwt.sign(
+payload,
+process.env.JWT_SECRET,
+{
+expiresIn:'1h'
+}
+);
+
+res.status(201).json({
+token,
+user:{
+id:user.id,
+username:user.username,
+email:user.email
+}
+});
+
+}
+catch(err){
+
+console.error(
+'Registration error:',
+err
+);
+
+res.status(500).json({
+error:err.message
+});
+
+}
+
 });
 
 
-module.exports = router;
+
+// LOGIN
+router.post('/login',async(req,res)=>{
+
+try{
+
+const {email,password}=req.body;
+
+const user=
+await User.findOne({email});
+
+if(!user){
+
+return res.status(401).json({
+error:'Invalid credentials'
+});
+
+}
+
+const match=
+await bcrypt.compare(
+password,
+user.password
+);
+
+if(!match){
+
+return res.status(401).json({
+error:'Invalid credentials'
+});
+
+}
+
+const payload={
+user:{
+id:user.id
+}
+};
+
+const token=jwt.sign(
+payload,
+process.env.JWT_SECRET,
+{expiresIn:'1h'}
+);
+
+res.json({
+token,
+user:{
+id:user.id,
+username:user.username,
+email:user.email
+}
+});
+
+}
+catch(err){
+
+res.status(500).json({
+error:err.message
+});
+
+}
+
+});
+
+
+
+// CURRENT USER
+router.get('/me',async(req,res)=>{
+
+try{
+
+const token=
+req.header('x-auth-token');
+
+if(!token){
+
+return res.status(401).json({
+error:'No token'
+});
+
+}
+
+const decoded=
+jwt.verify(
+token,
+process.env.JWT_SECRET
+);
+
+const user=
+await User.findById(
+decoded.user.id
+).select('-password');
+
+res.json(user);
+
+}
+catch(err){
+
+res.status(401).json({
+error:'Invalid token'
+});
+
+}
+
+});
+
+module.exports=router;

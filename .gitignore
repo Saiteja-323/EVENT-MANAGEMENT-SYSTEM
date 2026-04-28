@@ -1,0 +1,74 @@
+# -----------------------------
+# Logs
+# -----------------------------
+logs
+*.log
+server.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# -----------------------------
+# Dependencies
+# -----------------------------
+node_modules/
+
+# -----------------------------
+# Environment / Secrets
+# -----------------------------
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# -----------------------------
+# Build Output
+# -----------------------------
+dist/
+dist-ssr/
+build/
+
+# -----------------------------
+# Local config files
+# -----------------------------
+*.local
+
+# -----------------------------
+# Editor / IDE files
+# -----------------------------
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# -----------------------------
+# OS files
+# -----------------------------
+.DS_Store
+Thumbs.db
+
+# -----------------------------
+# Visual Studio files
+# -----------------------------
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# -----------------------------
+# Optional cache files
+# -----------------------------
+.cache/
+coverage/
+
+# -----------------------------
+# Keep these tracked (DO NOT IGNORE)
+# package.json
+# package-lock.json
+# client/src/
+# server/routes/
+# server/models/
+# -----------------------------
