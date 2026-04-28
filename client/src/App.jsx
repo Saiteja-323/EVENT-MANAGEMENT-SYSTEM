@@ -1,44 +1,89 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './context/AuthContext';
-import Layout from './components/Layout';
+
+import {
+BrowserRouter as Router,
+Routes,
+Route
+}
+from 'react-router-dom';
+
+import {
+AuthProvider
+}
+from './context/AuthContext';
+
 import Home from './pages/Home';
-import EventDetails from './pages/EventDetails';
-import CreateEvent from './pages/CreateEvent';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import './App.css';
-import './index.css';
 
-// Protected route component
-const ProtectedRoute = ({ children }) => {
-  const { user } = useAuth();
-  return user ? children : <Navigate to="/login" replace />;
-};
+import CreateEvent
+from './pages/CreateEvent';
 
-function App() {
-  return (
-    <AuthProvider>
-      <Router>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/events/:id" element={<EventDetails />} />
-            <Route 
-              path="/create-event" 
-              element={
-                <ProtectedRoute>
-                  <CreateEvent />
-                </ProtectedRoute>
-              } 
-            />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-          </Routes>
-        </Layout>
-      </Router>
-    </AuthProvider>
-  );
+import EditEvent
+from './pages/EditEvent';
+
+import EventDetails
+from './pages/EventDetails';
+
+import Login
+from './pages/Login';
+
+import Register
+from './pages/Register';
+
+import Layout
+from './components/Layout';
+
+function App(){
+
+return(
+
+<AuthProvider>
+
+<Router>
+
+<Layout>
+
+<Routes>
+
+<Route
+path="/"
+element={<Home/>}
+/>
+
+<Route
+path="/create-event"
+element={<CreateEvent/>}
+/>
+
+<Route
+path="/edit-event/:id"
+element={<EditEvent/>}
+/>
+
+<Route
+path="/events/:id"
+element={<EventDetails/>}
+/>
+
+<Route
+path="/login"
+element={<Login/>}
+/>
+
+<Route
+path="/register"
+element={<Register/>}
+/>
+
+</Routes>
+
+</Layout>
+
+</Router>
+
+</AuthProvider>
+
+);
+
 }
 
 export default App;

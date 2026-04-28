@@ -1,81 +1,91 @@
 import React from 'react';
+import {Link} from 'react-router-dom';
+import api from '../api/axios';
 
-import {Link}
-from 'react-router-dom';
+function EventCard({event}){
 
-import {Card}
-from 'react-bootstrap';
+const handleDelete=
+async()=>{
 
-const EventCard=({event})=>{
+if(
+window.confirm(
+"Delete this event?"
+)
+){
 
-const formatDate=(dateString)=>{
-
-const date=
-new Date(dateString);
-
-return date.toLocaleDateString(
-undefined,
-{
-year:'numeric',
-month:'short',
-day:'numeric',
-hour:'2-digit',
-minute:'2-digit'
-}
+await api.delete(
+`/api/events/${event._id}`
 );
 
-};
+window.location.reload();
 
+}
+
+};
 
 return(
 
-<Card className="h-100">
+<div
+style={{
+border:'1px solid #333',
+padding:'15px',
+borderRadius:'12px'
+}}
+>
+
+<img
+src={
+event.image ||
+'https://via.placeholder.com/300'
+}
+style={{
+width:'100%',
+height:'180px',
+objectFit:'cover'
+}}
+/>
+
+<h3>{event.title}</h3>
+
+<p>{event.location}</p>
 
 <div
 style={{
-height:'160px',
-backgroundImage:
-`url('${
-event.image ||
-"https://source.unsplash.com/random/600x400/?event"
-}')`,
-backgroundSize:'cover',
-backgroundPosition:'center'
+display:'flex',
+gap:'10px'
 }}
-></div>
-
-
-<Card.Body>
-
-<Card.Title>
-{event.title}
-</Card.Title>
-
-<p>
-{formatDate(event.date)}
-</p>
-
-<p>
-{event.location}
-</p>
-
-<p>
-{event.description}
-</p>
+>
 
 <Link
 to={`/events/${event._id}`}
-className="btn btn-primary"
 >
-View Details
+View
 </Link>
 
-</Card.Body>
+<Link
+to={`/edit-event/${event._id}`}
+>
+✏ Edit
+</Link>
 
-</Card>
+<button
+onClick={handleDelete}
+style={{
+border:'none',
+background:'red',
+color:'white',
+padding:'6px 10px'
+}}
+>
+🗑
+</button>
+
+</div>
+
+</div>
 
 );
 
-};
+}
 
 export default EventCard;
