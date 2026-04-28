@@ -1,217 +1,406 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Container, Button, Card, ListGroup, Spinner, Alert, Badge } from 'react-bootstrap';
-import { useAuth } from '../context/AuthContext';
+import React, {
+  useEffect,
+  useState
+} from 'react';
+
+import {
+  useParams,
+  Link
+} from 'react-router-dom';
+
 import api from '../api/axios';
 
-const EventDetails = () => {
+import {
+  useAuth
+} from '../context/AuthContext';
+
+
+function EventDetails() {
+
   const { id } = useParams();
-  const [event, setEvent] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [isRegistered, setIsRegistered] = useState(false);
 
   const { user } = useAuth();
-  const navigate = useNavigate();
 
-  const getInitial = (name) =>
-    typeof name === 'string' && name.length > 0
-      ? name.charAt(0).toUpperCase()
-      : '?';
+  const [event, setEvent] = useState(null);
+
+  const [message, setMessage] = useState('');
+
 
   useEffect(() => {
-    const fetchEvent = async () => {
-      try {
-        const res = await api.get(`/api/events/${id}`);
-        setEvent(res.data);
+    loadEvent();
+  }, []);
 
-        if (
-          user &&
-          Array.isArray(res.data.attendees) &&
-          res.data.attendees.some(a => a && a._id === user.id)
-        ) {
-          setIsRegistered(true);
-        }
-      } catch {
-        setError('Event not found. It may have been removed or the URL is incorrect.');
-      } finally {
-        setLoading(false);
-      }
-    };
 
-    fetchEvent();
-  }, [id, user]);
+  const loadEvent = async () => {
+
+    try {
+
+      const res =
+        await api.get(
+          `/api/events/${id}`
+        );
+
+      setEvent(res.data);
+
+    } catch (err) {
+
+      console.error(err);
+
+    }
+
+  };
+
+
 
   const handleRegister = async () => {
+
     try {
-      setLoading(true);
-      const res = await api.post(`/api/events/${id}/register`);
+
+      const res =
+        await api.post(
+          `/api/events/${id}/register`
+        );
+
       setEvent(res.data);
-      setIsRegistered(true);
-    } catch {
-      setError('Failed to register for this event. Please try again.');
-    } finally {
-      setLoading(false);
+
+      setMessage(
+        '✅ Registered successfully'
+      );
+
     }
+    catch (err) {
+
+      setMessage(
+        err.response?.data?.error ||
+        'Registration failed'
+      );
+
+    }
+
   };
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString(undefined, {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
 
-  if (loading && !event) {
+
+  if (!event) {
+
     return (
-      <Container className="text-center py-5">
-        <Spinner animation="border" variant="primary" />
-        <p className="mt-3">Loading event details...</p>
-      </Container>
+      <div style={loadingStyle}>
+        Loading...
+      </div>
     );
+
   }
 
+
+
+  const isOwner =
+    user &&
+    event.organizer &&
+    user.id === event.organizer._id;
+
+
+  const alreadyRegistered =
+    user &&
+    event.attendees?.some(
+      a => a._id === user.id
+    );
+
+
+
   return (
-    <Container className="py-4">
-      <Button variant="outline-secondary" onClick={() => navigate(-1)} className="mb-4">
-        <i className="bi bi-arrow-left me-1"></i> Back to Events
-      </Button>
 
-      {error && <Alert variant="danger" className="mb-4">{error}</Alert>}
+    <div style={pageStyle}>
 
-      {event ? (
-        <div className="mb-5">
-          <div className="d-flex align-items-center mb-3">
-            <Badge bg="primary" className="me-2">{event.category}</Badge>
-            <small className="text-muted">
-              Organized by <span className="fw-semibold">
-                {event.organizer?.username || 'Deleted User'}
-              </span>
-            </small>
+      <div style={cardStyle}>
+
+        {/* Hero Image */}
+        <div style={imageWrapperStyle}>
+          <img
+            src={
+              event.image ||
+              'https://via.placeholder.com/1000'
+            }
+            alt="event"
+            style={imageStyle}
+          />
+        </div>
+
+
+        {/* Title */}
+        <h1 style={titleStyle}>
+          {event.title}
+        </h1>
+
+
+        {/* Info Badges */}
+        <div style={badgeRowStyle}>
+
+          <span style={badgeStyle}>
+            📍 {event.location}
+          </span>
+
+          <span style={badgeStyle}>
+            🏷 {event.category}
+          </span>
+
+          <span style={badgeStyle}>
+            👥 {event.attendees.length} Attendees
+          </span>
+
+        </div>
+
+
+        {/* Description */}
+        <div style={sectionStyle}>
+
+          <h3 style={sectionHeadingStyle}>
+            About Event
+          </h3>
+
+          <p style={descStyle}>
+            {event.description}
+          </p>
+
+        </div>
+
+
+        {/* Success/Error Message */}
+        {message && (
+          <div style={messageStyle}>
+            {message}
+          </div>
+        )}
+
+
+
+        {/* Action Buttons */}
+        <div style={buttonRowStyle}>
+
+          {
+            !isOwner &&
+            user &&
+            !alreadyRegistered && (
+
+              <button
+                onClick={handleRegister}
+                style={registerBtnStyle}
+              >
+                Register Now
+              </button>
+
+            )
+          }
+
+
+          {
+            alreadyRegistered && (
+              <div style={registeredStyle}>
+                Already Registered
+              </div>
+            )
+          }
+
+
+          {
+            isOwner && (
+              <Link
+                to={`/edit-event/${event._id}`}
+                style={editBtnStyle}
+              >
+                ✏ Edit Event
+              </Link>
+            )
+          }
+
+        </div>
+
+
+
+        {/* Attendees */}
+        <div style={sectionStyle}>
+
+          <h3 style={sectionHeadingStyle}>
+            Attendees
+          </h3>
+
+          <div style={attendeeGridStyle}>
+
+            {
+              event.attendees.map(
+                person => (
+
+                  <div
+                    key={person._id}
+                    style={attendeeCardStyle}
+                  >
+
+                    <div style={avatarStyle}>
+                      {
+                        person.username
+                          .charAt(0)
+                          .toUpperCase()
+                      }
+                    </div>
+
+                    <span>
+                      {person.username}
+                    </span>
+
+                  </div>
+
+                )
+              )
+            }
+
           </div>
 
-          <div className="row g-4">
-            <div className="col-lg-8">
-              <Card className="border-0 shadow-sm">
-                <div
-                  className="bg-secondary rounded-top"
-                  style={{
-                    height: '300px',
-                    backgroundImage: `url('https://source.unsplash.com/random/1200x600/?event,${event.category}')`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center'
-                  }}
-                />
-                <Card.Body>
-                  <h1 className="display-5 fw-bold mb-3">{event.title}</h1>
-
-                  <div className="d-flex align-items-center text-muted mb-4">
-                    <i className="bi bi-calendar-event me-2"></i>
-                    <span>{formatDate(event.date)}</span>
-                    <i className="bi bi-geo-alt me-2 ms-3"></i>
-                    <span>{event.location}</span>
-                  </div>
-
-                  <div className="mb-4">
-                    <h3 className="h5 mb-3">About this event</h3>
-                    <p className="lead">{event.description}</p>
-                  </div>
-
-                  <div className="d-flex justify-content-start mt-5">
-                    {user && event.organizer && user.id === event.organizer._id ? (
-                      <Button variant="primary" size="lg" onClick={() => navigate(`/edit-event/${event._id}`)}>
-                        <i className="bi bi-pencil me-2"></i> Edit Event
-                      </Button>
-                    ) : !isRegistered ? (
-                      <Button
-                        variant="success"
-                        size="lg"
-                        onClick={handleRegister}
-                        disabled={loading}
-                      >
-                        {loading ? (
-                          <>
-                            <Spinner size="sm" animation="border" className="me-2" />
-                            Registering...
-                          </>
-                        ) : (
-                          <>
-                            <i className="bi bi-ticket-perforated me-2"></i>
-                            Register Now
-                          </>
-                        )}
-                      </Button>
-                    ) : (
-                      <Button variant="success" size="lg" disabled>
-                        <i className="bi bi-check-circle me-2"></i> Already Registered
-                      </Button>
-                    )}
-                  </div>
-                </Card.Body>
-              </Card>
-            </div>
-
-            <div className="col-lg-4">
-              <Card className="border-0 shadow-sm h-100">
-                <Card.Header className="py-3 bg-primary text-white">
-                  <h2 className="h5 mb-0">Attendees</h2>
-                </Card.Header>
-
-                <Card.Body className="p-0">
-                  <ListGroup variant="flush">
-                    <ListGroup.Item className="py-3">
-                      <div className="d-flex justify-content-between align-items-center">
-                        <span className="fw-semibold">Total Attendees</span>
-                        <Badge bg="primary" pill>
-                          {Array.isArray(event.attendees) ? event.attendees.length : 0}
-                        </Badge>
-                      </div>
-                    </ListGroup.Item>
-
-                    {Array.isArray(event.attendees) && event.attendees.length > 0 ? (
-                      event.attendees.map(attendee => (
-                        <ListGroup.Item
-                          key={attendee?._id || crypto.randomUUID()}
-                          className="d-flex align-items-center py-2"
-                        >
-                          <div
-                            className="bg-light text-primary rounded-circle d-flex align-items-center justify-content-center me-3"
-                            style={{ width: '36px', height: '36px' }}
-                          >
-                            {getInitial(attendee?.username)}
-                          </div>
-                          <span>{attendee?.username || 'Unknown User'}</span>
-                        </ListGroup.Item>
-                      ))
-                    ) : (
-                      <ListGroup.Item className="text-center py-4 text-muted">
-                        <i className="bi bi-people display-5 mb-3"></i>
-                        <p>No attendees yet</p>
-                      </ListGroup.Item>
-                    )}
-                  </ListGroup>
-                </Card.Body>
-              </Card>
-            </div>
-          </div>
         </div>
-      ) : (
-        <div className="text-center py-5">
-          <i className="bi bi-calendar-x display-1 text-muted"></i>
-          <h3>Event Not Found</h3>
-          <p className="text-muted">The event you're looking for doesn't exist</p>
-          <Button variant="primary" onClick={() => navigate('/')} className="mt-3">
-            Browse Events
-          </Button>
-        </div>
-      )}
-    </Container>
+
+      </div>
+
+    </div>
+
   );
-};
+
+}
 
 export default EventDetails;
+
+
+
+/* -------------------------
+   STYLES
+-------------------------- */
+
+const pageStyle = {
+  maxWidth: '1100px',
+  margin: '50px auto',
+  padding: '20px'
+};
+
+const cardStyle = {
+  background:
+    'linear-gradient(145deg,#111827,#0f172a)',
+  borderRadius: '24px',
+  padding: '35px',
+  boxShadow:
+    '0 0 30px rgba(0,0,0,.35)',
+  color: 'white'
+};
+
+const imageWrapperStyle = {
+  overflow: 'hidden',
+  borderRadius: '18px',
+  marginBottom: '30px'
+};
+
+const imageStyle = {
+  width: '100%',
+  height: '420px',
+  objectFit: 'cover'
+};
+
+const titleStyle = {
+  fontSize: '48px',
+  fontWeight: '700',
+  marginBottom: '25px'
+};
+
+const badgeRowStyle = {
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: '12px',
+  marginBottom: '30px'
+};
+
+const badgeStyle = {
+  background: '#1e293b',
+  padding: '10px 16px',
+  borderRadius: '30px'
+};
+
+const sectionStyle = {
+  marginTop: '30px'
+};
+
+const sectionHeadingStyle = {
+  fontSize: '28px',
+  marginBottom: '16px'
+};
+
+const descStyle = {
+  lineHeight: '1.8',
+  fontSize: '17px',
+  color: '#d1d5db'
+};
+
+const buttonRowStyle = {
+  display: 'flex',
+  gap: '15px',
+  marginTop: '30px',
+  flexWrap: 'wrap'
+};
+
+const registerBtnStyle = {
+  background: '#2563eb',
+  color: 'white',
+  border: 'none',
+  padding: '14px 24px',
+  borderRadius: '12px',
+  fontSize: '16px',
+  cursor: 'pointer'
+};
+
+const editBtnStyle = {
+  background: '#7c3aed',
+  color: 'white',
+  padding: '14px 24px',
+  borderRadius: '12px',
+  textDecoration: 'none'
+};
+
+const registeredStyle = {
+  background: '#065f46',
+  padding: '14px 22px',
+  borderRadius: '12px'
+};
+
+const messageStyle = {
+  marginTop: '20px',
+  background: '#1d4ed8',
+  padding: '14px',
+  borderRadius: '10px'
+};
+
+const attendeeGridStyle = {
+  display: 'grid',
+  gridTemplateColumns:
+    'repeat(auto-fit,minmax(220px,1fr))',
+  gap: '18px'
+};
+
+const attendeeCardStyle = {
+  background: '#1e293b',
+  padding: '18px',
+  borderRadius: '14px',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '12px'
+};
+
+const avatarStyle = {
+  width: '42px',
+  height: '42px',
+  borderRadius: '50%',
+  background: '#2563eb',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  fontWeight: 'bold'
+};
+
+const loadingStyle = {
+  color: 'white',
+  textAlign: 'center',
+  marginTop: '100px'
+};

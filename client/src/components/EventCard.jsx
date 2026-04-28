@@ -1,15 +1,33 @@
 import React from 'react';
-import {Link} from 'react-router-dom';
+
+import {
+Link
+} from 'react-router-dom';
+
 import api from '../api/axios';
 
+import {
+useAuth
+} from '../context/AuthContext';
+
 function EventCard({event}){
+
+const {user}=useAuth();
+
+
+const isOwner =
+user &&
+event.organizer &&
+user.id===event.organizer._id;
+
+
 
 const handleDelete=
 async()=>{
 
 if(
 window.confirm(
-"Delete this event?"
+'Delete event?'
 )
 ){
 
@@ -22,6 +40,8 @@ window.location.reload();
 }
 
 };
+
+
 
 return(
 
@@ -38,6 +58,7 @@ src={
 event.image ||
 'https://via.placeholder.com/300'
 }
+alt="event"
 style={{
 width:'100%',
 height:'180px',
@@ -45,14 +66,26 @@ objectFit:'cover'
 }}
 />
 
-<h3>{event.title}</h3>
 
-<p>{event.location}</p>
+<h3>
+{event.title}
+</h3>
+
+<p>
+{event.location}
+</p>
+
+<p>
+👥
+{event.attendees.length}
+attending
+</p>
+
 
 <div
 style={{
 display:'flex',
-gap:'10px'
+gap:'12px'
 }}
 >
 
@@ -62,6 +95,10 @@ to={`/events/${event._id}`}
 View
 </Link>
 
+
+{
+isOwner && (
+<>
 <Link
 to={`/edit-event/${event._id}`}
 >
@@ -71,14 +108,16 @@ to={`/edit-event/${event._id}`}
 <button
 onClick={handleDelete}
 style={{
-border:'none',
 background:'red',
 color:'white',
-padding:'6px 10px'
+border:'none'
 }}
 >
 🗑
 </button>
+</>
+)
+}
 
 </div>
 
